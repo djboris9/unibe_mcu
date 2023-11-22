@@ -1,6 +1,7 @@
 {
-	"image": "zephyr",
-	//"mounts": ["type=bind,source=/dev/bus/usb,target=/dev/bus/usb"],
+	"build": {
+		"dockerfile": "Dockerfile"
+	},
 	"runArgs": [
 		"--privileged",
 		"--cap-add=SYS_PTRACE",
