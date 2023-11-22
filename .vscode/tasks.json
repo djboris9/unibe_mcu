@@ -1,0 +1,26 @@
+{
+    "version": "2.0.0",
+    "tasks": [
+        {
+            "label": "Zephyr Build",
+            "type": "shell",
+            "command": "ninja -Cbuild",
+            "group": {
+                "kind": "build",
+                "isDefault": true
+            },
+            "dependsOn": [
+                "Zephyr CMake"
+            ]
+        },
+        {
+            "label": "Zephyr CMake",
+            "type": "shell",
+            "command": "cmake -Bbuild -GNinja app/",
+            "group": {
+                "kind": "build",
+                "isDefault": false
+            }
+        }
+    ]
+}

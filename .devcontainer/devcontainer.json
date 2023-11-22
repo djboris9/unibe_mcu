@@ -1,0 +1,21 @@
+{
+	"image": "zephyr",
+	//"mounts": ["type=bind,source=/dev/bus/usb,target=/dev/bus/usb"],
+	"runArgs": [
+		"--privileged",
+		"--cap-add=SYS_PTRACE",
+		"--security-opt", "seccomp=unconfined",
+		"--device=/dev/bus/usb"
+	],
+	"remoteEnv": {
+		"PATH": "${containerEnv:PATH}:/home/vscode/zephyr-sdk-0.16.3/sysroots/x86_64-pokysdk-linux/usr/bin/"
+	},
+	"customizations": {
+		"vscode": {
+			"extensions": [
+				"marus25.cortex-debug",
+				"edonet.vscode-command-runner"
+			]
+		}
+	}
+}
