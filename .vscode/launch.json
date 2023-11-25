@@ -19,7 +19,7 @@
             "servertype": "openocd",
             "rtos": "Zephyr",
             "runToEntryPoint": "main",
-            "preLaunchTask": "Zephyr Build",
+            "preLaunchTask": "Zephyr west flash",
         }
     ]
 }

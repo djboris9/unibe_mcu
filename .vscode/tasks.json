@@ -2,25 +2,31 @@
     "version": "2.0.0",
     "tasks": [
         {
-            "label": "Zephyr Build",
+            "label": "Zephyr west build",
             "type": "shell",
-            "command": "ninja -Cbuild",
-            "group": {
-                "kind": "build",
-                "isDefault": true
+            "command": "west build",
+            "options": {
+                "cwd": "${workspaceFolder}/app/"
             },
-            "dependsOn": [
-                "Zephyr CMake"
-            ]
-        },
-        {
-            "label": "Zephyr CMake",
-            "type": "shell",
-            "command": "cmake -Bbuild -GNinja app/",
             "group": {
                 "kind": "build",
                 "isDefault": false
             }
+        },
+        {
+            "label": "Zephyr west flash",
+            "type": "shell",
+            "command": "west flash",
+            "options": {
+                "cwd": "${workspaceFolder}/app/"
+            },
+            "group": {
+                "kind": "build",
+                "isDefault": false
+            },
+            "dependsOn": [
+                "Zephyr west build"
+            ]
         }
     ]
 }
