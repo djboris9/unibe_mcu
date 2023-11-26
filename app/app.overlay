@@ -1,0 +1,5 @@
+/* is nodelabel arduino_spi */
+&spi1 {
+    status = "okay";
+    cs-gpios = <&gpiob 6 GPIO_ACTIVE_HIGH>;
+};
