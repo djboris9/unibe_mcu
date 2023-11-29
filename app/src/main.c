@@ -2,18 +2,34 @@
 #include <zephyr/kernel.h>
 #include <zephyr/drivers/spi.h>
 #include <zephyr/devicetree/spi.h>
+#include <zephyr/logging/log.h>
 
+LOG_MODULE_REGISTER(lcd, CONFIG_LOG_DEFAULT_LEVEL);
+
+// Defines
+#define LCD_CMD_PAGE_0 0xB0
+#define LCD_CMD_COL_0 0x10
+
+// Periphery
 static const struct device *const gpioa_dev = DEVICE_DT_GET(DT_NODELABEL(gpioa));
 static const struct device *const lcd_dev = DEVICE_DT_GET(DT_NODELABEL(arduino_spi));
 static struct spi_cs_control spi_cs_ctrl = SPI_CS_CONTROL_INIT(DT_NODELABEL(arduino_spi), 2);
 static struct spi_config spi_cfg;
 
+// Manages A0 pin on display
 void setRegisterMode(bool data) {
 	if (data) {
 		gpio_pin_set(gpioa_dev, 8, 1);
 	} else {
 		gpio_pin_set(gpioa_dev, 8, 0);
 	}
+}
+
+// Manages RST pin on display
+void resetDisplay() {
+	gpio_pin_set(gpioa_dev, 6, 0);
+	k_msleep(1);
+	gpio_pin_set(gpioa_dev, 6, 1);
 }
 
 int sendInstruction(uint8_t inst) {
@@ -41,8 +57,8 @@ int sendInstruction(uint8_t inst) {
 void setRandomDisplay() {
 	// Set random display data
 	uint8_t data[128];
-	for (int i = 0; i < 128; i++) {
-		data[i] = 0x01;
+	for (int i = 0; i < 64; i++) {
+		data[i] = 0xff;
 	}
 
 	// Send it to screen
@@ -66,14 +82,10 @@ void setRandomDisplay() {
 }
 
 int main(void) {
-	printk("Hello World! %s\n", CONFIG_BOARD);
+	LOG_INF("Hello World! %s\n", CONFIG_BOARD);
 
-	// Reset device
+	// Configure GPIOs
 	gpio_pin_configure(gpioa_dev, 6, GPIO_OUTPUT_LOW | DT_GPIO_FLAGS(DT_NODELABEL(gpio0), gpios));
-	k_msleep(1);
-	gpio_pin_configure(gpioa_dev, 6, GPIO_OUTPUT_HIGH | DT_GPIO_FLAGS(DT_NODELABEL(gpio0), gpios));
-
-	// Set PA8 to low (A0 channel)
 	gpio_pin_configure(gpioa_dev, 8, GPIO_OUTPUT_LOW | DT_GPIO_FLAGS(DT_NODELABEL(gpio0), gpios));
 
 	// Configure SPI port for display from devicetree
@@ -82,17 +94,22 @@ int main(void) {
 	spi_cfg.operation = SPI_OP_MODE_MASTER | SPI_HALF_DUPLEX  | SPI_TRANSFER_MSB | SPI_WORD_SET(8);
 	spi_cfg.cs = spi_cs_ctrl;
 
+	// Prepare display
+	resetDisplay();
+	setRegisterMode(false);
+
+	// Initialize display
 	sendInstruction(0xA0); // ADC_NORMAL
 	sendInstruction(0xAE); // DISPLAY_OFF
-    sendInstruction(0xC8); // (COMMON_OUTPUT_MODE_REVERSE);
-    sendInstruction(0xA2); // (BIAS_ONE_NINTH);
-    sendInstruction(0x2F); // (POWER_CONTROL_SET_7);
-    sendInstruction(0x21); // (INTERNAL_RESISTOR_RATIO_1);
+	sendInstruction(0xC8); // COMMON_OUTPUT_MODE_REVERSE
+	sendInstruction(0xA2); // BIAS_ONE_NINTH
+	sendInstruction(0x2F); // POWER_CONTROL_SET_7
+	sendInstruction(0x21); // INTERNAL_RESISTOR_RATIO_1
+	sendInstruction(0xAF); // DISPLAY_ON
 
-	//sendInstruction(0x81); // (SET_ELECTRONIC_VOLUME);
-	//sendInstruction(0x1F); // (ELECTRONIC_VOLUME_31);
-
-    sendInstruction(0xAF); // (DISPLAY_ON);
+	// Set display to page 0, column 0 (this shouldn't be necessary)
+	sendInstruction(LCD_CMD_PAGE_0); // Page 0
+	sendInstruction(LCD_CMD_COL_0); // Column 0
 	setRandomDisplay();
 	
 	printk("finished\n");
