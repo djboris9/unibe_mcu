@@ -5,4 +5,4 @@ find_package(Zephyr)
 project(tack)
 
 
-target_sources(app PRIVATE src/main.c)
+target_sources(app PRIVATE src/display.c src/main.c)
