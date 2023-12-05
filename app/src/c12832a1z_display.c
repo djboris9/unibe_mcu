@@ -87,9 +87,6 @@ static int c12832a1z_init(void) {
 static void c12832a1z_display_get_capabilities(const struct device *dev,
 		struct display_capabilities *capabilities)
 {
-	const struct c12832a1z_display_config *config = dev->config;
-	struct c12832a1z_display_data *disp_data = dev->data;
-
 	memset(capabilities, 0, sizeof(struct display_capabilities));
 	capabilities->x_resolution = 128;
 	capabilities->y_resolution = 64;
@@ -141,8 +138,6 @@ static int c12832a1z_display_write(const struct device *dev, const uint16_t x,
 			       const struct display_buffer_descriptor *desc,
 			       const void *buf)
 {
-	const struct c12832a1z_display_config *config = dev->config;
-
 	// print position but we rerender the whole screen
 	printf("Writing %dx%d (w,h) @ %dx%d (x,y)\n", desc->width, desc->height, x, y);
 

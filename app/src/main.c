@@ -1,7 +1,7 @@
 #include <zephyr/kernel.h>
 #include <zephyr/logging/log.h>
 #include <zephyr/display/cfb.h>
-#include "display.h"
+#include "c12832a1z_display.h"
 #include "cfb_font_gcathin.h"
 
 LOG_MODULE_REGISTER(unibe_mcu, CONFIG_LOG_DEFAULT_LEVEL);
