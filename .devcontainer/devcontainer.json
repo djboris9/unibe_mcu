@@ -15,7 +15,8 @@
 		"vscode": {
 			"extensions": [
 				"marus25.cortex-debug",
-				"edonet.vscode-command-runner"
+				"edonet.vscode-command-runner",
+				"ms-vscode.cpptools"
 			]
 		}
 	}

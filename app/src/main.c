@@ -3,12 +3,16 @@
 #include <zephyr/display/cfb.h>
 #include "c12832a1z_display.h"
 #include "cfb_font_gcathin.h"
+#include "gps.h"
 
 LOG_MODULE_REGISTER(unibe_mcu, CONFIG_LOG_DEFAULT_LEVEL);
 
 int main(void) {
 	int ret;
 	LOG_INF("Hello World! %s\n", CONFIG_BOARD);
+
+	// Initialize GPS
+	gps_init();
 
 	struct device *display_dev = c12832a1z_device(); 
 	if (display_dev == NULL) {

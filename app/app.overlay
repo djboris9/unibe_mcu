@@ -3,3 +3,21 @@
     status = "okay";
     cs-gpios = <&gpiob 6 GPIO_ACTIVE_HIGH>;
 };
+
+/* required for usart3 async API */
+&dma1 {
+    status = "okay";
+};
+
+/*
+ * DMA channel 4 has slots for USART3_TX and USART3_RX
+ */
+&usart3 {
+    status = "okay";
+	pinctrl-0 = < &usart3_tx_pc10 &usart3_rx_pc11 >;
+	pinctrl-names = "default";
+    dmas = < &dma1 3 4 0x400 0 >,
+           < &dma1 1 4 0x480 0 >;
+	dma-names = "tx", "rx";
+    current-speed = <9600>;
+};
