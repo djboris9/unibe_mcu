@@ -2,6 +2,7 @@
 #include <zephyr/logging/log.h>
 #include <zephyr/display/cfb.h>
 #include "display.h"
+#include "cfb_font_gcathin.h"
 
 LOG_MODULE_REGISTER(unibe_mcu, CONFIG_LOG_DEFAULT_LEVEL);
 
@@ -22,6 +23,13 @@ int main(void) {
 	ret = cfb_framebuffer_init(display_dev);
 	if (ret) {
 		LOG_ERR("Error %d: Failed to initialize CFB\n", ret);
+		return ret;
+	}
+
+	// Set font
+	ret = cfb_framebuffer_set_font(display_dev, 0);
+	if (ret) {
+		LOG_ERR("Error %d: Failed to set font\n", ret);
 		return ret;
 	}
 

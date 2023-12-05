@@ -178,11 +178,19 @@ static int c12832a1z_display_write(const struct device *dev, const uint16_t x,
 	// print position
 	printf("Writing %dx%d (w,h) @ %dx%d (x,y)\n", desc->width, desc->height, x, y);
 
+	// Invert all pixels
+	int tlen = 128*4;
+	uint8_t buf2[tlen];
+	for (int i = 0; i < tlen; i++) {
+		//printf("pos: %d\n", i);
+		//printf("pos2: %d\n", tlen-i);
+		buf2[i] = ((uint8_t*)buf)[tlen-i];
+	}
+
 	// Buffer for data
 	for (int i = 0; i < 4; i++) {
-		printf("page: %d\n", i);
 		setRegisterMode(false); // Set to instruction mode
-		sendInstruction(LCD_CMD_PAGE_0 + 3 - i); // Switch to page i, inverted
+		sendInstruction(LCD_CMD_PAGE_0 + i); // Switch to page i, inverted
 		sendInstruction(LCD_CMD_COL_0); // Column 0
 
 		setRegisterMode(true); // Set to data mode
@@ -190,7 +198,8 @@ static int c12832a1z_display_write(const struct device *dev, const uint16_t x,
 		// Shift address of buf by whole columns
 		uint8_t data = 0xff;
 		struct spi_buf txb;
-		txb.buf = (uint8_t*)buf + (i*128);
+		txb.buf = buf2 + (i*128);
+		//txb.buf = (uint8_t*)buf + (i*128);
 		txb.len = 128U;
 
 		// Buffer set for data
@@ -228,7 +237,7 @@ static const struct display_driver_api c12832a1z_display_api = {
 struct device *c12832a1z_device(void) {
 	struct device *dev = malloc(sizeof(*dev));
 	dev->name = "C12832A1Z";
-	dev->data = malloc((128/8) * (64/8)); // 1 Bit per pixel (PPT=1 here)
+	//dev->data = malloc((128/8) * (64/8)); // 1 Bit per pixel (PPT=1 here)
 	dev->api = &c12832a1z_display_api;
 
 	InitDisplay();
