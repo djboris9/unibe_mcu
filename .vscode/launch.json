@@ -4,7 +4,7 @@
         {
             "name": "Launch",
             "cwd": "${workspaceFolder}",
-            "executable": "./build/zephyr/zephyr.elf",
+            "executable": "app/build/zephyr/zephyr.elf",
             "gdbPath": "/home/vscode/zephyr-sdk-0.16.3/arm-zephyr-eabi/bin/arm-zephyr-eabi-gdb",
             "objdumpPath": "/home/vscode/zephyr-sdk-0.16.3/arm-zephyr-eabi/bin/arm-zephyr-eabi-objdump",
             "armToolchainPath": "/home/vscode/zephyr-sdk-0.16.3/arm-zephyr-eabi/bin",
@@ -17,9 +17,8 @@
             "request": "launch",
             "type": "cortex-debug",
             "servertype": "openocd",
-            "rtos": "Zephyr",
-            "runToEntryPoint": "main",
-            "preLaunchTask": "Zephyr west flash",
+            "rtos": "auto",
+            "runToEntryPoint": "main"
         }
     ]
 }
