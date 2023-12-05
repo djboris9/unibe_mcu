@@ -57,34 +57,7 @@ static int sendInstruction(uint8_t inst) {
 	return 0;
 }
 
-static void setRandomDisplay() {
-	// Set random display data
-	uint8_t data[128];
-	for (int i = 0; i < 64; i++) {
-		data[i] = 0xff;
-	}
-
-	// Send it to screen
-	setRegisterMode(true); // Set to data mode
-
-	// Buffer for data
-	struct spi_buf txb;
-	txb.buf = data;
-	txb.len = 128U;
-
-	// Buffer set for data
-	struct spi_buf_set txbufs;
-	txbufs.buffers = &txb;
-	txbufs.count = 1U;
-
-	// Send data
-	int ret = spi_write(lcd_dev, &spi_cfg, &txbufs);
-	if (ret) {
-		LOG_ERR("Error %d: Failed to write to SPI device\n", ret);
-	}
-}
-
-int InitDisplay(void) {
+static int c12832a1z_init(void) {
 	// Configure GPIOs
 	gpio_pin_configure(gpioa_dev, 6, GPIO_OUTPUT_LOW | DT_GPIO_FLAGS(DT_NODELABEL(gpio0), gpios));
 	gpio_pin_configure(gpioa_dev, 8, GPIO_OUTPUT_LOW | DT_GPIO_FLAGS(DT_NODELABEL(gpio0), gpios));
@@ -108,11 +81,6 @@ int InitDisplay(void) {
 	sendInstruction(0x21); // INTERNAL_RESISTOR_RATIO_1
 	sendInstruction(0xAF); // DISPLAY_ON
 
-	// Set display to page 0, column 0 (this shouldn't be necessary)
-	sendInstruction(LCD_CMD_PAGE_0); // Page 0
-	sendInstruction(LCD_CMD_COL_0); // Column 0
-	//setRandomDisplay();
-	
 	return 0;
 }
 
@@ -175,15 +143,13 @@ static int c12832a1z_display_write(const struct device *dev, const uint16_t x,
 {
 	const struct c12832a1z_display_config *config = dev->config;
 
-	// print position
+	// print position but we rerender the whole screen
 	printf("Writing %dx%d (w,h) @ %dx%d (x,y)\n", desc->width, desc->height, x, y);
 
 	// Invert all pixels
 	int tlen = 128*4;
 	uint8_t buf2[tlen];
 	for (int i = 0; i < tlen; i++) {
-		//printf("pos: %d\n", i);
-		//printf("pos2: %d\n", tlen-i);
 		buf2[i] = ((uint8_t*)buf)[tlen-i];
 	}
 
@@ -237,10 +203,9 @@ static const struct display_driver_api c12832a1z_display_api = {
 struct device *c12832a1z_device(void) {
 	struct device *dev = malloc(sizeof(*dev));
 	dev->name = "C12832A1Z";
-	//dev->data = malloc((128/8) * (64/8)); // 1 Bit per pixel (PPT=1 here)
 	dev->api = &c12832a1z_display_api;
 
-	InitDisplay();
+	c12832a1z_init();
 	
 	return dev;
 }

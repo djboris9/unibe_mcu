@@ -10,9 +10,6 @@ int main(void) {
 	int ret;
 	LOG_INF("Hello World! %s\n", CONFIG_BOARD);
 
-	// Configure periphery
-	InitDisplay();
-
 	struct device *display_dev = c12832a1z_device(); 
 	if (display_dev == NULL) {
 		LOG_ERR("%s\n", "Error: Failed to get display device");
