@@ -3,16 +3,34 @@
 #include <zephyr/display/cfb.h>
 #include "c12832a1z_display.h"
 #include "cfb_font_gcathin.h"
+#include "comm.h"
 #include "gps.h"
 
 LOG_MODULE_REGISTER(unibe_mcu, CONFIG_LOG_DEFAULT_LEVEL);
+
+K_FIFO_DEFINE(locsvc_fifo);
 
 int main(void) {
 	int ret;
 	LOG_INF("Hello World! %s\n", CONFIG_BOARD);
 
 	// Initialize GPS
-	gps_init();
+	gps_init(&locsvc_fifo);
+
+	// Read from locsvc_fifo
+	struct locsvc_fifo_t *rx_data;
+	while (1) {
+		rx_data = k_fifo_get(&locsvc_fifo, K_FOREVER);
+		//printf("Received for UART: '%.*s'\n", rx_data->data_len, rx_data->data);
+
+		// Filter data that starts with '$GNGGA'
+		if (rx_data->data_len >= 6 && strncmp(rx_data->data, "$GNGGA", 6) == 0) {
+			printf("Received for GPS: '%.*s'\n", rx_data->data_len, rx_data->data);
+		}
+
+		k_free(rx_data->data);
+		k_free(rx_data);
+	}
 
 	struct device *display_dev = c12832a1z_device(); 
 	if (display_dev == NULL) {

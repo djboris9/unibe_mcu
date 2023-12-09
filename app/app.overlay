@@ -10,7 +10,8 @@
 };
 
 /*
- * DMA channel 4 has slots for USART3_TX and USART3_RX
+ * DMA channel 4 has slots for USART3_TX and USART3_RX.
+ * Documentation: https://docs.zephyrproject.org/latest/build/dts/api/bindings/dma/st,stm32-dma-v1.html
  */
 &usart3 {
     status = "okay";
