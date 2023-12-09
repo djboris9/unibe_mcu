@@ -37,7 +37,7 @@ static void uart_callback(const struct device *dev, struct uart_event *evt, void
                         tx_data->data = line;
 
                         k_fifo_put((struct k_fifo*) user_data, tx_data);
-                        //printf("Received: '%.*s'\n", linebuf_idx, linebuf);
+                        printf("sent\n");
                     }
 
                     linebuf_idx = 0;
