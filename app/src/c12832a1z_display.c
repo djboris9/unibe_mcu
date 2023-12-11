@@ -94,10 +94,6 @@ static void c12832a1z_display_get_capabilities(const struct device *dev,
 	capabilities->screen_info = SCREEN_INFO_MONO_VTILED | SCREEN_INFO_MONO_MSB_FIRST;
 }
 
-static void NIY(void) {
-	LOG_ERR("%s\n", "Not implemented yet");
-}
-
 static int c12832a1z_display_blanking_off(const struct device *dev)
 {
 	return 0; // TODO
@@ -157,7 +153,6 @@ static int c12832a1z_display_write(const struct device *dev, const uint16_t x,
 		setRegisterMode(true); // Set to data mode
 
 		// Shift address of buf by whole columns
-		uint8_t data = 0xff;
 		struct spi_buf txb;
 		txb.buf = buf2 + (i*128);
 		//txb.buf = (uint8_t*)buf + (i*128);

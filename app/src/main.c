@@ -8,6 +8,7 @@
 
 LOG_MODULE_REGISTER(unibe_mcu, CONFIG_LOG_DEFAULT_LEVEL);
 
+// FIFO for location services data
 K_FIFO_DEFINE(locsvc_fifo);
 
 // Variables for display
@@ -83,7 +84,7 @@ int main(void) {
 			if (ret != 7) {
 				// Set disp_gps value to "unknown"
 				snprintf(disp_gps, 20, "unknown");
-				continue;
+				goto finish;
 			}
 			printf("Ret: %d\n", ret);
 			printf("Time: %f\n", time);
@@ -96,6 +97,8 @@ int main(void) {
 			snprintf(disp_gps, 20, "%.2f %c %.2f %c", lat, lat_c, lng, lng_c);
 		}
 
+		// Free memory
+		finish:
 		k_free(rx_data->data);
 		k_free(rx_data);
 
