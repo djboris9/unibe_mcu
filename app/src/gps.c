@@ -2,8 +2,11 @@
 #include <zephyr/device.h>
 #include <zephyr/devicetree.h>
 #include <zephyr/drivers/uart.h>
+#include <zephyr/logging/log.h>
 #include <string.h>
 #include "comm.h"
+
+LOG_MODULE_DECLARE(unibe_mcu, CONFIG_LOG_DEFAULT_LEVEL);
 
 const struct device *const dev_usart = DEVICE_DT_GET(DT_NODELABEL(usart3));
 
@@ -16,7 +19,8 @@ int linebuf_idx = 0;
 static void uart_callback(const struct device *dev, struct uart_event *evt, void *user_data) {
     switch (evt->type) {
         case UART_RX_RDY:
-            printf("UART RX ready. offset=%d len=%d\n", evt->data.rx.offset, evt->data.rx.len);
+            LOG_DBG("UART RX ready. offset=%d len=%d", evt->data.rx.offset, evt->data.rx.len);
+
             for (int i = 0; i < evt->data.rx.len; i++) {
                 // Get current char
                 char chr = evt->data.rx.buf[evt->data.rx.offset + i];
@@ -49,30 +53,30 @@ static void uart_callback(const struct device *dev, struct uart_event *evt, void
             }
             break;
         case UART_TX_DONE:
-            printf("UART TX done\n");
+            LOG_DBG("UART TX done");
             break;
         case UART_RX_BUF_REQUEST:
-            printf("UART RX buffer request\n");
+            LOG_DBG("UART RX buffer request");
             // Respond to buffer request
             char* buf = k_malloc(BUFLEN);
             int ret = uart_rx_buf_rsp(dev, buf, BUFLEN);
             if (ret) {
-                printf("Cannot respond to buffer request: %d\n", ret);
+                LOG_ERR("Cannot respond to buffer request: %d", ret);
             }
             break;
         case UART_RX_BUF_RELEASED:
-            printf("UART RX buffer released\n");
+            LOG_DBG("UART RX buffer released");
             k_free(evt->data.rx_buf.buf);
             //printf("Received: %s\n", buf[curbuf]);
             break;
         case UART_RX_STOPPED:
-            printf("UART RX stopped\n");
+            LOG_ERR("%s", "UART RX stopped");
             break;
         case UART_TX_ABORTED:
-            printf("UART TX aborted\n");
+            LOG_ERR("%s", "UART TX aborted");
             break;
         default:
-            printf("UART unknown event\n");
+            LOG_ERR("%s", "UART unknown event");
             break;
     }
 }

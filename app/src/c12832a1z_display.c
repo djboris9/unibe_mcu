@@ -135,7 +135,7 @@ static int c12832a1z_display_write(const struct device *dev, const uint16_t x,
 			       const void *buf)
 {
 	// print position but we rerender the whole screen
-	printf("Writing %dx%d (w,h) @ %dx%d (x,y)\n", desc->width, desc->height, x, y);
+	// printf("Writing %dx%d (w,h) @ %dx%d (x,y)\n", desc->width, desc->height, x, y);
 
 	// Invert all pixels
 	int tlen = 128*4;
@@ -155,7 +155,6 @@ static int c12832a1z_display_write(const struct device *dev, const uint16_t x,
 		// Shift address of buf by whole columns
 		struct spi_buf txb;
 		txb.buf = buf2 + (i*128);
-		//txb.buf = (uint8_t*)buf + (i*128);
 		txb.len = 128U;
 
 		// Buffer set for data
@@ -169,8 +168,6 @@ static int c12832a1z_display_write(const struct device *dev, const uint16_t x,
 			LOG_ERR("Error %d: Failed to write to SPI device\n", ret);
 		}
 	}
-
-	printf("done\n");
 
 	return 0;
 }

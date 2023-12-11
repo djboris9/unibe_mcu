@@ -13,11 +13,27 @@ K_FIFO_DEFINE(locsvc_fifo);
 
 // Variables for display
 struct device *display_dev;
-char disp_gps[20];
+char disp_gps_lat[20];
+char disp_gps_lng[20];
 
 void updateScreen(void) {
-	// Print data to screen
-	int ret = cfb_print(display_dev, disp_gps, 0, 0);
+	int ret;
+	// Clear screen
+	ret = cfb_framebuffer_clear(display_dev, true);
+	if (ret) {
+		LOG_ERR("Error %d: Failed to clear display\n", ret);
+		return;
+	}
+
+	// Print latitude to screen
+	ret = cfb_print(display_dev, disp_gps_lat, 0, 0);
+	if (ret) {
+		LOG_ERR("Error %d: Failed to print to display\n", ret);
+		return;
+	}
+
+	// Print longitude to screen
+	ret = cfb_print(display_dev, disp_gps_lng, 0, 10);
 	if (ret) {
 		LOG_ERR("Error %d: Failed to print to display\n", ret);
 		return;
@@ -52,19 +68,15 @@ int main(void) {
 		return ret;
 	}
 
-	// Set font
+	// Set font for CFB
 	ret = cfb_framebuffer_set_font(display_dev, 0);
 	if (ret) {
 		LOG_ERR("Error %d: Failed to set font\n", ret);
 		return ret;
 	}
 
-	// Clear screen
-	ret = cfb_framebuffer_clear(display_dev, true);
-	if (ret) {
-		LOG_ERR("Error %d: Failed to clear display\n", ret);
-		return ret;
-	}
+	// Initial screen
+	updateScreen();
 
 	// Read from locsvc_fifo
 	struct locsvc_fifo_t *rx_data;
@@ -83,7 +95,8 @@ int main(void) {
 			ret = sscanf(rx_data->data, "$GNGGA,%f,%f,%c,%f,%c,%d,%d", &time, &lat, &lat_c, &lng, &lng_c, &q, &sat);
 			if (ret != 7) {
 				// Set disp_gps value to "unknown"
-				snprintf(disp_gps, 20, "unknown");
+				snprintf(disp_gps_lat, 20, "unknown lat");
+				snprintf(disp_gps_lng, 20, "unknown lng");
 				goto finish;
 			}
 			printf("Ret: %d\n", ret);
@@ -93,8 +106,14 @@ int main(void) {
 			printf("Q: %d\n", q);
 			printf("Sat: %d\n", sat);
 
-			// Set display string
-			snprintf(disp_gps, 20, "%.2f %c %.2f %c", lat, lat_c, lng, lng_c);
+			// Reformat coordinates and set display string
+			int lat_deg = lat/100;
+			lat -= lat_deg*100;
+			int lng_deg = lng/100;
+			lng -= lng_deg*100;
+
+			snprintf(disp_gps_lat, 20, "%2d %.2f %c", lat_deg, lat, lat_c);
+			snprintf(disp_gps_lng, 20, "%2d %.2f %c", lng_deg, lng, lng_c);
 		}
 
 		// Free memory
@@ -102,6 +121,7 @@ int main(void) {
 		k_free(rx_data->data);
 		k_free(rx_data);
 
+		// Update screen
 		updateScreen();
 	}
 
