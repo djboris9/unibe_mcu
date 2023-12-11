@@ -82,9 +82,13 @@ int main(void) {
 	struct locsvc_fifo_t *rx_data;
 	while (1) {
 		rx_data = k_fifo_get(&locsvc_fifo, K_FOREVER);
+		bool changedDisplay = false;
 
 		// Filter data that starts with '$GNGGA'
 		if (rx_data->data_len >= 6 && strncmp(rx_data->data, "$GNGGA", 6) == 0) {
+			// We want to update the display in any case
+			changedDisplay = true;
+
 			printf("Received for GPS: '%.*s'\n", rx_data->data_len, (char*)rx_data->data);
 			// Example: $GNGGA,114529.000,4656.2592,N,00725.8373,E,2,09,1.23,563.4,M,48.0,M,,*78
 			//                 time       lat         lon          Q #s  HDOP  alt   sep  age  ref
@@ -97,6 +101,7 @@ int main(void) {
 				// Set disp_gps value to "unknown"
 				snprintf(disp_gps_lat, 20, "unknown lat");
 				snprintf(disp_gps_lng, 20, "unknown lng");
+
 				goto finish;
 			}
 			printf("Ret: %d\n", ret);
@@ -107,13 +112,14 @@ int main(void) {
 			printf("Sat: %d\n", sat);
 
 			// Reformat coordinates and set display string
+			// We use only degrees and minutes, no DMS format
 			int lat_deg = lat/100;
 			lat -= lat_deg*100;
 			int lng_deg = lng/100;
 			lng -= lng_deg*100;
 
-			snprintf(disp_gps_lat, 20, "%2d %.2f %c", lat_deg, lat, lat_c);
-			snprintf(disp_gps_lng, 20, "%2d %.2f %c", lng_deg, lng, lng_c);
+			snprintf(disp_gps_lat, 20, "%2d %.3f' %c", lat_deg, lat, lat_c);
+			snprintf(disp_gps_lng, 20, "%2d %.3f' %c", lng_deg, lng, lng_c);
 		}
 
 		// Free memory

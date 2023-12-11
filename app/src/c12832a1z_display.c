@@ -63,7 +63,7 @@ static int c12832a1z_init(void) {
 	gpio_pin_configure(gpioa_dev, 8, GPIO_OUTPUT_LOW | DT_GPIO_FLAGS(DT_NODELABEL(gpio0), gpios));
 
 	// Configure SPI port for display from devicetree
-	spi_cfg.frequency = 400000; // 400kHz
+	spi_cfg.frequency = 1200000; // 1200kHz
 	spi_cfg.slave = 0;
 	spi_cfg.operation = SPI_OP_MODE_MASTER | SPI_HALF_DUPLEX  | SPI_TRANSFER_MSB | SPI_WORD_SET(8);
 	spi_cfg.cs = spi_cs_ctrl;
@@ -144,9 +144,10 @@ static int c12832a1z_display_write(const struct device *dev, const uint16_t x,
 		buf2[i] = ((uint8_t*)buf)[tlen-i];
 	}
 
+	setRegisterMode(false); // Set to instruction mode
+
 	// Buffer for data
 	for (int i = 0; i < 4; i++) {
-		setRegisterMode(false); // Set to instruction mode
 		sendInstruction(LCD_CMD_PAGE_0 + i); // Switch to page i, inverted
 		sendInstruction(LCD_CMD_COL_0); // Column 0
 
@@ -167,6 +168,8 @@ static int c12832a1z_display_write(const struct device *dev, const uint16_t x,
 		if (ret) {
 			LOG_ERR("Error %d: Failed to write to SPI device\n", ret);
 		}
+
+		setRegisterMode(false); // Set to instruction mode back
 	}
 
 	return 0;
