@@ -4,6 +4,11 @@
     cs-gpios = <&gpiob 6 GPIO_ACTIVE_HIGH>;
 };
 
+&i2c1 {
+	clock-frequency = < 0x61a80 >;
+    pinctrl-0 = < &i2c1_scl_pb8 &i2c1_sda_pb9 >;
+};
+
 /* required for usart3 async API */
 &dma1 {
     status = "okay";

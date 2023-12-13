@@ -5,6 +5,7 @@
 #include "cfb_font_gcathin.h"
 #include "comm.h"
 #include "gps.h"
+#include "magneto.h"
 
 LOG_MODULE_REGISTER(unibe_mcu, CONFIG_LOG_DEFAULT_LEVEL);
 
@@ -54,6 +55,9 @@ int main(void) {
 	// Initialize GPS
 	gps_init(&locsvc_fifo);
 
+	// Initialize magnetometer
+	magneto_init(&locsvc_fifo);
+	
 	// Initialize display
 	display_dev = c12832a1z_device(); 
 	if (display_dev == NULL) {

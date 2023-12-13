@@ -6,7 +6,7 @@ include(${ZEPHYR_BASE}/cmake/cfb.cmake NO_POLICY_SCOPE) # CFB custom font depend
 project(tack)
 
 
-target_sources(app PRIVATE src/c12832a1z_display.c src/gps.c src/main.c)
+target_sources(app PRIVATE src/c12832a1z_display.c src/magneto.c src/gps.c src/main.c)
 
 # CFB custom font dependencies
 set(gen_dir ${ZEPHYR_BINARY_DIR}/include/generated/)
