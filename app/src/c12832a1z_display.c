@@ -96,12 +96,12 @@ static void c12832a1z_display_get_capabilities(const struct device *dev,
 
 static int c12832a1z_display_blanking_off(const struct device *dev)
 {
-	return 0; // TODO
+	return 0; // NIY
 }
 
 static int c12832a1z_display_blanking_on(const struct device *dev)
 {
-	return 0; // TODO
+	return 0; // NIY
 }
 
 static int c12832a1z_display_read(const struct device *dev, const uint16_t x,

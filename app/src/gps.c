@@ -10,8 +10,10 @@ LOG_MODULE_DECLARE(unibe_mcu, CONFIG_LOG_DEFAULT_LEVEL);
 
 const struct device *const dev_usart = DEVICE_DT_GET(DT_NODELABEL(usart3));
 
+// DMA buffer length
 #define BUFLEN 128
 
+// Line scanner buffer length
 #define LINEBUFLEN 128
 uint8_t linebuf[LINEBUFLEN];
 int linebuf_idx = 0;
