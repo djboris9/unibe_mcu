@@ -108,12 +108,6 @@ int main(void) {
 
 				goto finish;
 			}
-			printf("Ret: %d\n", ret);
-			printf("Time: %f\n", time);
-			printf("Lat: %f %c\n", lat, lat_c);
-			printf("Lng: %f %c\n", lng, lng_c);
-			printf("Q: %d\n", q);
-			printf("Sat: %d\n", sat);
 
 			// Reformat coordinates and set display string
 			// We use only degrees and minutes, no DMS format
