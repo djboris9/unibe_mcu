@@ -78,18 +78,21 @@ int magneto_read(struct k_fifo *result_fifo) {
 
     printf("heading: %f\n", heading);
 
-    /*
+    // Send heading to the result FIFO
+    int *heading_int = k_malloc(sizeof(int));
+    *heading_int = (int)heading;
+
     struct locsvc_fifo_t *tx_data = k_malloc(sizeof(struct locsvc_fifo_t));
     tx_data->type = LOCSVC_FIFO_TYPE_MAG;
     tx_data->data_len = sizeof(int);
-    tx_data->data = (int)heading;
+    tx_data->data = heading_int;
 
     k_fifo_put(result_fifo, tx_data);
-    */
+
     return 0;
 }
 
-int magneto_init(struct k_fifo *result_fifo) {
+int magneto_init() {
     int ret;
 
     // Make device ready
@@ -165,13 +168,35 @@ int magneto_init(struct k_fifo *result_fifo) {
         return -1;
     }
 
-    k_msleep(50); // Wait for magnetometer to start up
-
-    for (int i = 0; i < 50; i++) {
-        magneto_read(0);
-        k_msleep(200);
-    }
-
-    magneto_read(0);
+    // Wait for magnetometer to start up
+    k_msleep(50);
+    
     return 0;
+}
+
+// Thread for magnetometer reading. This could have been also
+// implemented using a timer and a work queue.
+
+// 500 byte stack area
+K_THREAD_STACK_DEFINE(mag_thread_stack_area, 500);
+struct k_thread mag_thread_data;
+
+static void mag_thread_entry_point(void *p1, void *, void *) {
+    // Get FIFO
+    struct k_fifo *result_fifo = (struct k_fifo *)p1;
+
+    while (1) {
+        magneto_read(result_fifo);
+        k_msleep(300);
+    }
+}
+
+// magneto_start starts the magnetometer thread
+void magneto_start(struct k_fifo *result_fifo) {
+    k_tid_t mag_thread = k_thread_create(&mag_thread_data, mag_thread_stack_area,
+        K_THREAD_STACK_SIZEOF(mag_thread_stack_area),
+        mag_thread_entry_point,
+        result_fifo, NULL, NULL, 0, 0, K_NO_WAIT);
+    
+    k_thread_name_set(mag_thread, "magneto");
 }
