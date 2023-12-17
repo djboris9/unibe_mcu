@@ -117,7 +117,7 @@ static void *c12832a1z_display_get_framebuffer(const struct device *dev)
 	return NULL;
 }
 
-static int c12832a1z_NIY2(const struct device *dev, const uint8_t arg)
+static int c12832a1z_NIY(const struct device *dev, const uint8_t arg)
 {
 	return -ENOTSUP;
 }
@@ -135,7 +135,7 @@ static int c12832a1z_display_write(const struct device *dev, const uint16_t x,
 			       const void *buf)
 {
 	// print position but we rerender the whole screen
-	// printf("Writing %dx%d (w,h) @ %dx%d (x,y)\n", desc->width, desc->height, x, y);
+	LOG_DBG("Writing %dx%d (w,h) @ %dx%d (x,y)\n", desc->width, desc->height, x, y);
 
 	// Invert all pixels
 	int tlen = 128*4;
@@ -181,8 +181,8 @@ static const struct display_driver_api c12832a1z_display_api = {
 	.write = c12832a1z_display_write,
 	.read = c12832a1z_display_read,
 	.get_framebuffer = c12832a1z_display_get_framebuffer,
-	.set_brightness = c12832a1z_NIY2, //c12832a1z_display_set_brightness,
-	.set_contrast = c12832a1z_NIY2, //c12832a1z_display_set_contrast,
+	.set_brightness = c12832a1z_NIY, //c12832a1z_display_set_brightness,
+	.set_contrast = c12832a1z_NIY, //c12832a1z_display_set_contrast,
 	.get_capabilities = c12832a1z_display_get_capabilities,
 	.set_pixel_format = c12832a1z_display_set_pixel_format,
 };

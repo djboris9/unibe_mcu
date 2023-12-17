@@ -6,6 +6,7 @@ enum locsvc_fifo_type {
     LOCSVC_FIFO_TYPE_MAG,
 };
 
+// FIFO data structure
 struct locsvc_fifo_t {
     void *fifo_reserved; /* 1st word reserved for use by FIFO */
     enum locsvc_fifo_type type;

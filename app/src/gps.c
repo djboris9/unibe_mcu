@@ -69,7 +69,6 @@ static void uart_callback(const struct device *dev, struct uart_event *evt, void
         case UART_RX_BUF_RELEASED:
             LOG_DBG("UART RX buffer released");
             k_free(evt->data.rx_buf.buf);
-            //printf("Received: %s\n", buf[curbuf]);
             break;
         case UART_RX_STOPPED:
             LOG_ERR("%s", "UART RX stopped");
@@ -88,7 +87,7 @@ int gps_init(struct k_fifo *result_fifo) {
 
     // Make device ready
     if (!device_is_ready(dev_usart)) {
-        printk("Device %s is not ready; cannot connect\n", dev_usart->name);
+        LOG_ERR("Device %s is not ready; cannot connect\n", dev_usart->name);
         return -1;
     }
 
@@ -99,10 +98,9 @@ int gps_init(struct k_fifo *result_fifo) {
     char* buf = k_malloc(BUFLEN);
     ret = uart_rx_enable(dev_usart, buf, BUFLEN, SYS_FOREVER_US);
     if (ret) {
-        printk("Cannot enable RX: %d\n", ret);
+        LOG_ERR("Cannot enable RX: %d\n", ret);
         return -1;
     }
-
 
     return 0;
 }

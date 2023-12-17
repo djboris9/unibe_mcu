@@ -27,7 +27,7 @@ static void selectBank(uint8_t bank) {
 }
 
 // magneto_read reads the magnetometer data from the AK09916
-int magneto_read(struct k_fifo *result_fifo) {
+static int magneto_read(struct k_fifo *result_fifo) {
     int ret;
 
     // Read magnetometer data
@@ -61,7 +61,7 @@ int magneto_read(struct k_fifo *result_fifo) {
     float mag_z_f = (float)mag_z * 0.15f;
 
     // Send magnetometer data to the result FIFO
-    printf("magneto: %f %f %f\n", mag_x_f, mag_y_f, mag_z_f);
+    LOG_DBG("magneto: %f %f %f\n", mag_x_f, mag_y_f, mag_z_f);
 
     // Convert data to compass heading in degrees
     // Reference: https://cdn-shop.adafruit.com/datasheets/AN203_Compass_Heading_Using_Magnetometers.pdf
@@ -76,7 +76,7 @@ int magneto_read(struct k_fifo *result_fifo) {
         heading = 0.0f;
     }
 
-    printf("heading: %f\n", heading);
+    LOG_DBG("heading: %f\n", heading);
 
     // Send heading to the result FIFO
     int *heading_int = k_malloc(sizeof(int));

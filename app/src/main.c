@@ -109,7 +109,7 @@ static bool process_mag_data(struct locsvc_fifo_t *rx_data) {
 
 int main(void) {
 	int ret;
-	LOG_INF("Hello World! %s\n", CONFIG_BOARD);
+	LOG_INF("Hello BME on %s\n", CONFIG_BOARD);
 
 	// Initialize GPS
 	gps_init(&locsvc_fifo);
